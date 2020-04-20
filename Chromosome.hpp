@@ -25,7 +25,7 @@ class Chromosome {
     bool operator[](const size_t i) const;
     static Children crossover(const Chromosome& p1, const Chromosome& p2);
     void mutate();
-    
+
     std::vector<bool> m_Genome;
 
     static size_t s_GenomeSize;
@@ -79,6 +79,7 @@ Children Chromosome::crossover(const Chromosome& p1, const Chromosome& p2) {
             children.first.m_Genome.push_back(parent[i]);
             children.second.m_Genome.push_back(!parent[i]);
         }
+        return std::move(children);
     }   
 #endif
     return Children(p1, p2);
