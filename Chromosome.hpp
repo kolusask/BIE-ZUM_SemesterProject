@@ -3,12 +3,14 @@
 #include "Constants.hpp"
 #include "Random.hpp"
 
+#include <functional>
 #include <random>
 #include <vector>
 
 class Chromosome;
 
 using Children = std::pair<Chromosome, Chromosome>;
+using Genome = std::vector<bool>;
 
 class Chromosome {
   public:
@@ -21,12 +23,15 @@ class Chromosome {
     /// Produce a chromosome from two parents (using crossover and mutation)
     Children operator+(const Chromosome& other) const;
 
+    /// Calculate fitness from genome using passed function
+    size_t fitness(const std::function<size_t(const Genome&)>& fitFun);
+
   private:
     bool operator[](const size_t i) const;
     static Children crossover(const Chromosome& p1, const Chromosome& p2);
     void mutate();
 
-    std::vector<bool> m_Genome;
+    Genome m_Genome;
 
     static size_t s_GenomeSize;
 };
@@ -50,6 +55,10 @@ Children Chromosome::operator+(const Chromosome& other) const {
     children.first.mutate();
     children.second.mutate();
     return std::move(children);
+}
+
+size_t Chromosome::fitness(const std::function<size_t(const Genome&)>& fitFun) {
+    return fitFun(m_Genome);
 }
 
 bool Chromosome::operator[](const size_t i) const { return this->m_Genome[i]; }
