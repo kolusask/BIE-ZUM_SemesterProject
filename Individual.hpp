@@ -24,29 +24,33 @@ class Individual {
     Children operator+(const Individual& other) const;
 
     /// Calculate fitness from genome using passed function
-    size_t fitness(const std::function<size_t(const Genome&)>& fitFun);
+    size_t fitness(const std::function<size_t(const Genome&)>& fitFun) const;
+
+    /// Getter for genome size
+    size_t genome_size() const;
 
   private:
-    bool operator[](const size_t i) const;
     static Children crossover(const Individual& p1, const Individual& p2);
     void mutate();
 
     Genome m_Genome;
+
+    mutable bool m_FitnessKnown = false;
+    mutable size_t m_Fitness;
 
     static size_t s_GenomeSize;
 };
 
 size_t Individual::s_GenomeSize = 0;
 
-Individual::Individual(const size_t size) {
-    m_Genome.reserve(size);
+Individual::Individual(const size_t size) : m_Genome(size) {
     s_GenomeSize = size;
 }
 
 Individual Individual::random(const size_t size) {
     Individual result(size);
     for (size_t i = 0; i < size; i++)
-        result.m_Genome.push_back(Random::generate().next_bool());
+        result.m_Genome[i] = (Random::generate().next_bool());
     return std::move(result);
 }
 
@@ -57,11 +61,15 @@ Children Individual::operator+(const Individual& other) const {
     return std::move(children);
 }
 
-size_t Individual::fitness(const std::function<size_t(const Genome&)>& fitFun) {
-    return fitFun(m_Genome);
+size_t Individual::fitness(const std::function<size_t(const Genome&)>& fitFun) const {
+    if (!m_FitnessKnown)
+        m_Fitness = fitFun(m_Genome);
+    return m_Fitness;
 }
 
-bool Individual::operator[](const size_t i) const { return this->m_Genome[i]; }
+size_t Individual::genome_size() const {
+    return s_GenomeSize;
+}
 
 Children Individual::crossover(const Individual& p1, const Individual& p2) {
 #if CROSSOVER_POINTS > 0    
@@ -75,8 +83,8 @@ Children Individual::crossover(const Individual& p1, const Individual& p2) {
             const size_t stop = points[i + 1];
             const Individual& parent = i % 2 ? p2 : p1;
             for (size_t j = start; j < stop; j++) {
-                children.first.m_Genome.push_back(parent[i]);
-                children.second.m_Genome.push_back(!parent[i]);
+                children.first.m_Genome[j] = parent.m_Genome[j];
+                children.second.m_Genome[j] = !parent.m_Genome[j];
             }
         }
 #if CROSSOVER_POINTS % 2 == 0
@@ -85,8 +93,8 @@ Children Individual::crossover(const Individual& p1, const Individual& p2) {
         const Individual& parent = p2;
 #endif
         for (size_t i = points[CROSSOVER_POINTS - 1]; i < s_GenomeSize; i++) {
-            children.first.m_Genome.push_back(parent[i]);
-            children.second.m_Genome.push_back(!parent[i]);
+            children.first.m_Genome[i] = parent.m_Genome[i];
+            children.second.m_Genome[i] = !parent.m_Genome[i];
         }
         return std::move(children);
     }   
