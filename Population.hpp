@@ -12,8 +12,11 @@ using Parents = std::pair<Individual, Individual>;
 
 class Population {
   public:
-    Population(const size_t size, const std::function<size_t(const Genome&)>& fitFun);
+    Population(const size_t genSize, const std::function<size_t(const Genome&)>& fitFun);
+    void operator=(const Population& other);
     Population evolve() const;
+    Genome find_best(const FitLambda& fitFun) const;
+    size_t fitness_sum() const;
 
   private:
     Population(const std::function<size_t(const Genome&)>& fitFun, const Individuals& ind);
@@ -25,9 +28,9 @@ class Population {
     size_t m_FitnessSum;
 };
 
-Population::Population(const size_t size, const std::function<size_t(const Genome&)>& fitFun) : m_CalcFitness(fitFun), m_FitnessSum(0) {
+Population::Population(const size_t genSize, const std::function<size_t(const Genome&)>& fitFun) : m_CalcFitness(fitFun), m_FitnessSum(0) {
     for (size_t i = 0; i < POPULATION_SIZE; i++) {
-        Individual ind = Individual::random(size);
+        Individual ind = Individual::random(genSize);
         m_Individuals.push_back(ind);
         m_FitnessSum += ind.fitness(fitFun);
     }
@@ -42,6 +45,11 @@ Population::Population(const std::function<size_t(const Genome&)>& fitFun, const
     );
 }
 
+void Population::operator=(const Population& other) {
+    this->m_Individuals = std::move(other.m_Individuals);
+    this->m_FitnessSum = other.m_FitnessSum;
+}
+
 Population Population::evolve() const {
     Individuals nextPop;
     for (size_t i = 0; i < POPULATION_SIZE; i++) {
@@ -51,6 +59,19 @@ Population Population::evolve() const {
         nextPop.push_back(children.second);
     }
     return Population(m_CalcFitness, nextPop);
+}
+
+Genome Population::find_best(const FitLambda& fitFun) const {
+    return std::max_element(
+        m_Individuals.begin(), m_Individuals.end(),
+        [&fitFun] (const Individual& i1, const Individual& i2) -> bool {
+            return i1.fitness(fitFun) < i2.fitness(fitFun);
+        }
+    )->genome();
+}
+
+size_t Population::fitness_sum() const {
+    return m_FitnessSum;
 }
 
 const Individual& Population::select_1() const {
