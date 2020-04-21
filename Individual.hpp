@@ -11,6 +11,7 @@ class Individual;
 
 using Children = std::pair<Individual, Individual>;
 using Genome = std::vector<bool>;
+using FitLambda = std::function<size_t(const Genome&)>;
 
 class Individual {
   public:
@@ -24,7 +25,10 @@ class Individual {
     Children operator+(const Individual& other) const;
 
     /// Calculate fitness from genome using passed function
-    size_t fitness(const std::function<size_t(const Genome&)>& fitFun) const;
+    size_t fitness(const FitLambda& fitFun) const;
+
+    /// Get genome
+    Genome genome() const;
 
     /// Getter for genome size
     size_t genome_size() const;
@@ -61,10 +65,14 @@ Children Individual::operator+(const Individual& other) const {
     return std::move(children);
 }
 
-size_t Individual::fitness(const std::function<size_t(const Genome&)>& fitFun) const {
+size_t Individual::fitness(const FitLambda& fitFun) const {
     if (!m_FitnessKnown)
         m_Fitness = fitFun(m_Genome);
     return m_Fitness;
+}
+
+Genome Individual::genome() const {
+    return m_Genome;
 }
 
 size_t Individual::genome_size() const {
