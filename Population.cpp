@@ -33,17 +33,13 @@ Population Population::evolve() const {
     return Population(m_CalcFitness, nextPop);
 }
 
-Genome Population::find_best(const FitLambda& fitFun) const {
-    return std::max_element(
+Individual Population::find_best(const FitLambda& fitFun) const {
+    return *std::max_element(
         m_Individuals.begin(), m_Individuals.end(),
         [&fitFun] (const Individual& i1, const Individual& i2) -> bool {
             return i1.fitness(fitFun) < i2.fitness(fitFun);
         }
-    )->genome();
-}
-
-size_t Population::fitness_sum() const {
-    return m_FitnessSum;
+    );
 }
 
 const Individual& Population::select_1() const {
