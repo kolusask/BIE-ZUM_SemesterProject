@@ -20,7 +20,7 @@ Children Individual::operator+(const Individual& other) const {
     return std::move(children);
 }
 
-size_t Individual::fitness(const FitLambda& fitFun) const {
+double Individual::fitness(const FitLambda& fitFun) const {
     if (!m_FitnessKnown)
         m_Fitness = fitFun(m_Genome);
     return m_Fitness;

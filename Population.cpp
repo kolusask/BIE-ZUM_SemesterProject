@@ -1,6 +1,6 @@
 #include "Population.hpp"
 
-Population::Population(const size_t genSize, const std::function<size_t(const Genome&)>& fitFun) : m_CalcFitness(fitFun), m_FitnessSum(0) {
+Population::Population(const size_t genSize, const FitLambda& fitFun) : m_CalcFitness(fitFun), m_FitnessSum(0) {
     for (size_t i = 0; i < POPULATION_SIZE; i++) {
         Individual ind = Individual::random(genSize);
         m_Individuals.push_back(ind);
@@ -8,10 +8,10 @@ Population::Population(const size_t genSize, const std::function<size_t(const Ge
     }
 }
 
-Population::Population(const std::function<size_t(const Genome&)>& fitFun, const Individuals& ind) : m_CalcFitness(fitFun), m_Individuals(std::move(ind)) {
+Population::Population(const FitLambda& fitFun, const Individuals& ind) : m_CalcFitness(fitFun), m_Individuals(std::move(ind)) {
     m_FitnessSum = std::accumulate(
         m_Individuals.begin(), m_Individuals.end(), size_t(0), 
-        [&fitFun](const size_t val, const Individual& ind) -> size_t { 
+        [&fitFun](const double val, const Individual& ind) -> double { 
             return val + ind.fitness(fitFun); 
         }
     );
@@ -43,8 +43,8 @@ Individual Population::find_best(const FitLambda& fitFun) const {
 }
 
 const Individual& Population::select_1() const {
-    const size_t select = Random::generate().next_size_t(m_FitnessSum);
-    size_t tempSum = 0;
+    const double select = Random::generate().next_double(m_FitnessSum);
+    double tempSum = 0;
     for (const auto& ind : m_Individuals) {
         tempSum += ind.fitness(m_CalcFitness);
         if (tempSum >= select)

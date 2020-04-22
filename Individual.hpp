@@ -11,7 +11,7 @@ class Individual;
 
 using Children = std::pair<Individual, Individual>;
 using Genome = std::vector<bool>;
-using FitLambda = std::function<size_t(const Genome&)>;
+using FitLambda = std::function<double(const Genome&)>;
 
 class Individual {
   public:
@@ -25,7 +25,7 @@ class Individual {
     Children operator+(const Individual& other) const;
 
     /// Calculate fitness from genome using passed function
-    size_t fitness(const FitLambda& fitFun) const;
+    double fitness(const FitLambda& fitFun) const;
 
     /// Get genome
     Genome genome() const;
@@ -40,7 +40,7 @@ class Individual {
     Genome m_Genome;
 
     mutable bool m_FitnessKnown = false;
-    mutable size_t m_Fitness;
+    mutable double m_Fitness;
 
     static size_t s_GenomeSize;
 };

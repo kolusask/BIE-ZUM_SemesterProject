@@ -8,15 +8,15 @@
 #include <vector>
 
 struct Item {
-    size_t value;
-    size_t weight;
+    double value;
+    double weight;
     void operator += (const Item& other) {
         this->value += other.value;
         this->weight += other.weight;
     }
 };
 
-std::vector<Item> read_input(size_t& maxWeight) {
+std::vector<Item> read_input(double& maxWeight) {
     size_t nItems;
     std::cin >> maxWeight >> nItems;
     std::vector<Item> items(nItems);
@@ -25,8 +25,8 @@ std::vector<Item> read_input(size_t& maxWeight) {
     return std::move(items);
 }
 
-FitLambda construct_lambda(const std::vector<Item>& items, const size_t maxWeight) {
-    auto fitLambda = [&items, maxWeight] (const Genome& genome) -> size_t {
+FitLambda construct_lambda(const std::vector<Item>& items, const double maxWeight) {
+    auto fitLambda = [&items, maxWeight] (const Genome& genome) -> double {
         Item common = { 0, 0 };
         for (size_t i = 0; i < genome.size(); i++) {
             if (genome[i]) {
@@ -40,7 +40,7 @@ FitLambda construct_lambda(const std::vector<Item>& items, const size_t maxWeigh
     return fitLambda;
 }
 
-size_t evolve(const size_t genomeSize, const FitLambda& fitFun, Genome& genome) {
+double evolve(const size_t genomeSize, const FitLambda& fitFun, Genome& genome) {
     Population population(genomeSize, fitFun);
     for (size_t i = 0; i < NUMBER_OF_GENERATIONS; i++)
             population = population.evolve();
@@ -49,8 +49,8 @@ size_t evolve(const size_t genomeSize, const FitLambda& fitFun, Genome& genome) 
     return best.fitness(fitFun);
 }
 
-size_t calc_weight(const Genome& genome, const std::vector<Item>& items) {
-    size_t weight = 0;
+double calc_weight(const Genome& genome, const std::vector<Item>& items) {
+    double weight = 0;
     for (size_t i = 0; i < genome.size(); i++)
         if (genome[i])
             weight += items[i].weight;
@@ -66,14 +66,14 @@ void print_result(const std::vector<Item>& items, const Genome& genome) {
 }
 
 int main() {
-    size_t maxWeight;
+    double maxWeight;
     std::vector<Item> items = read_input(maxWeight);
     FitLambda fitLambda = construct_lambda(items, maxWeight);
 
     Genome genome;
-    size_t valueSum = evolve(items.size(), fitLambda, genome);
+    double valueSum = evolve(items.size(), fitLambda, genome);
 
-    size_t weightSum = calc_weight(genome, items);
+    double weightSum = calc_weight(genome, items);
     if (weightSum <= maxWeight) {
         print_result(items, genome);
         std::cout << "Common value:\t" << valueSum << std::endl;

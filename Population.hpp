@@ -12,17 +12,17 @@ using Parents = std::pair<Individual, Individual>;
 
 class Population {
   public:
-    Population(const size_t genSize, const std::function<size_t(const Genome&)>& fitFun);
+    Population(const size_t genSize, const FitLambda& fitFun);
     void operator=(const Population& other);
     Population evolve() const;
     Individual find_best(const FitLambda& fitFun) const;
 
   private:
-    Population(const std::function<size_t(const Genome&)>& fitFun, const Individuals& ind);
+    Population(const FitLambda& fitFun, const Individuals& ind);
     const Individual& select_1() const;
     const Parents select_2() const;
 
-    const std::function<size_t(const Genome&)> m_CalcFitness;
+    const FitLambda m_CalcFitness;
     Individuals m_Individuals;
-    size_t m_FitnessSum;
+    double m_FitnessSum;
 };
