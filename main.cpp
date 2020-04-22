@@ -26,7 +26,7 @@ std::vector<Item> read_input(size_t& maxWeight) {
 }
 
 FitLambda construct_lambda(const std::vector<Item>& items, const size_t maxWeight) {
-    auto fitLambda = [&items, &maxWeight] (const Genome& genome) -> size_t {
+    auto fitLambda = [&items, maxWeight] (const Genome& genome) -> size_t {
         Item common = { 0, 0 };
         for (size_t i = 0; i < genome.size(); i++) {
             if (genome[i]) {
@@ -43,9 +43,10 @@ FitLambda construct_lambda(const std::vector<Item>& items, const size_t maxWeigh
 size_t evolve(const size_t genomeSize, const FitLambda& fitFun, Genome& genome) {
     Population population(genomeSize, fitFun);
     for (size_t i = 0; i < NUMBER_OF_GENERATIONS; i++)
-        population = population.evolve();
-    genome = std::move(population.find_best(fitFun));
-    return population.fitness_sum();
+            population = population.evolve();
+    Individual best = std::move(population.find_best(fitFun));
+    genome = best.genome();
+    return best.fitness(fitFun);
 }
 
 size_t calc_weight(const Genome& genome, const std::vector<Item>& items) {
@@ -61,7 +62,7 @@ void print_result(const std::vector<Item>& items, const Genome& genome) {
     std::cout << "Number\tValue\tWeight" << std::endl;
     for (size_t i = 0; i < genome.size(); i++)
         if (genome[i]) 
-            std::cout << i << ":\t\t" << items[i].value << '\t' << items[i].weight << std::endl;
+            std::cout << i + 1 << ":\t" << items[i].value << '\t' << items[i].weight << std::endl;
 }
 
 int main() {
@@ -83,3 +84,21 @@ int main() {
 
     return 0;
 }
+
+/*
+    20 8
+    1 10
+    2 10
+    3 10
+    4 10
+    5 100
+    6 100
+    7 100
+    8 100
+*/
+/*
+    50 3
+    60 10
+    100 20
+    120 30
+*/
