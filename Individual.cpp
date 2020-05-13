@@ -10,14 +10,14 @@ Individual Individual::random(const size_t size) {
     Individual result(size);
     for (size_t i = 0; i < size; i++)
         result.m_Genome[i] = (Random::generate().next_bool());
-    return std::move(result);
+    return result;
 }
 
 Children Individual::operator+(const Individual& other) const {
     Children children = crossover(*this, other);
     children.first.mutate();
     children.second.mutate();
-    return std::move(children);
+    return children;
 }
 
 double Individual::fitness(const FitLambda& fitFun) const {
@@ -59,7 +59,7 @@ Children Individual::crossover(const Individual& p1, const Individual& p2) {
             children.first.m_Genome[i] = parent.m_Genome[i];
             children.second.m_Genome[i] = !parent.m_Genome[i];
         }
-        return std::move(children);
+        return children;
     }   
 #endif
     return Children(p1, p2);

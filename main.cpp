@@ -22,7 +22,7 @@ std::vector<Item> read_input(double& maxWeight) {
     std::vector<Item> items(nItems);
     for (size_t i = 0; i < nItems; i++)
         std::cin >> items[i].value >> items[i].weight;
-    return std::move(items);
+    return items;
 }
 
 FitLambda construct_lambda(const std::vector<Item>& items, const double maxWeight) {
