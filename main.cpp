@@ -17,9 +17,11 @@ struct Item {
 };
 
 std::vector<Item> read_input(double& maxWeight) {
+    std::cout << "MaxWeight nItems" << std::endl;
     size_t nItems;
     std::cin >> maxWeight >> nItems;
     std::vector<Item> items(nItems);
+    std::cout << "value weight" << std::endl;
     for (size_t i = 0; i < nItems; i++)
         std::cin >> items[i].value >> items[i].weight;
     return items;
