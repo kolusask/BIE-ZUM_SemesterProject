@@ -13,6 +13,11 @@ using Children = std::pair<Individual, Individual>;
 using Genome = std::vector<bool>;
 using FitLambda = std::function<double(const Genome&)>;
 
+/**
+ * @class
+ * A class representing one individual in the population.
+ * Essentially, a wrapper for a binary array (genome) capable of performing crossover and mutation necessary for evolution.
+ */
 class Individual {
   public:
     /// Constructor from genome size
@@ -39,8 +44,10 @@ class Individual {
 
     Genome m_Genome;
 
+    /// Two members used to prevent recalculation of the fitness
     mutable bool m_FitnessKnown = false;
     mutable double m_Fitness;
 
+    /// Size of the genome (binary array) - remains constant through evolution
     static size_t s_GenomeSize;
 };

@@ -16,6 +16,7 @@ struct Item {
     }
 };
 
+/// Reads input from the user in the specified format (W n v[0] w[0] v[1] 2[1] ...)
 std::vector<Item> read_input(double& maxWeight) {
     std::cout << "MaxWeight nItems" << std::endl;
     size_t nItems;
@@ -27,6 +28,7 @@ std::vector<Item> read_input(double& maxWeight) {
     return items;
 }
 
+/// Builds the fit function based on the user input
 FitLambda construct_lambda(const std::vector<Item>& items, const double maxWeight) {
     auto fitLambda = [&items, maxWeight] (const Genome& genome) -> double {
         Item common = { 0, 0 };
@@ -42,6 +44,7 @@ FitLambda construct_lambda(const std::vector<Item>& items, const double maxWeigh
     return fitLambda;
 }
 
+/// Driver function for the evolution process
 double evolve(const size_t genomeSize, const FitLambda& fitFun, Genome& genome) {
     Population population(genomeSize, fitFun);
     for (size_t i = 0; i < NUMBER_OF_GENERATIONS; i++)
@@ -51,6 +54,7 @@ double evolve(const size_t genomeSize, const FitLambda& fitFun, Genome& genome) 
     return best.fitness(fitFun);
 }
 
+/// Gets the total weight of all items selected by a given genome
 double calc_weight(const Genome& genome, const std::vector<Item>& items) {
     double weight = 0;
     for (size_t i = 0; i < genome.size(); i++)
@@ -59,6 +63,7 @@ double calc_weight(const Genome& genome, const std::vector<Item>& items) {
     return weight;
 }
 
+/// Prints the algorithm output in a fancy format
 void print_result(const std::vector<Item>& items, const Genome& genome) {
     std::cout << "Elements to put into a knapsack:" << std::endl;
     std::cout << "Number\tValue\tWeight" << std::endl;
@@ -78,8 +83,8 @@ int main() {
     double weightSum = calc_weight(genome, items);
     if (weightSum <= maxWeight) {
         print_result(items, genome);
-        std::cout << "Common value:\t" << valueSum << std::endl;
-        std::cout << "Common weight:\t" << weightSum << std::endl;
+        std::cout << "Total value:\t" << valueSum << std::endl;
+        std::cout << "Total weight:\t" << weightSum << std::endl;
     } else {
         std::cout << "Sorry, the knapsack is too small" << std::endl;
     }
